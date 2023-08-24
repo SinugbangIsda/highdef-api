@@ -11,13 +11,13 @@ export const signin = async (req: Request, res: Response) => {
         });
 
         if (!userExists) {
-            throw { message: 'Account does not exist!' };
+            throw 'Account does not exist!';
         }
 
         const verifyPassword = await bcrypt.compare(req.body.password, userExists.password);
 
         if (!verifyPassword) {
-            throw { message: 'Incorrect password.' };
+            throw 'Incorrect password.';
         }
 
         const token = jwt.sign({ _id: userExists._id }, SECRET_TOKEN, {
@@ -41,8 +41,19 @@ export const signup = async (req: Request, res: Response) => {
             emailAddress: req.body.emailAddress
         });
 
+        const validatePassword = (value: string) => {
+            const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+            return regex.test(value);
+        };
+
         if (userExists) {
-            throw { messagge: 'Account already exists!' };
+            throw 'Account already exists!';
+        }
+
+        const isPasswordValid = validatePassword(req.body.password);
+
+        if (!isPasswordValid) {
+            throw 'Password must have a minimum length of 8 characters, at least 1 uppercase letter, and at least 1 special character.';
         }
 
         const user = new User({
