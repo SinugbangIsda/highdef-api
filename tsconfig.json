@@ -8,5 +8,5 @@
         "strict": true,
         "skipLibCheck": true
     },
-    "include": ["src/**/*", "config", "constants", "controllers", "middlewares", "models", "routes", "index.ts"]
+    "include": ["src/**/*", "config", "constants", "controllers/middlewares/models", "routes", "index.ts", "controllers", "constants", "middlewares", "models"]
 }
