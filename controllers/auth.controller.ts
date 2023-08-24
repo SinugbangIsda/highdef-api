@@ -7,7 +7,7 @@ import { SECRET_TOKEN } from '../constants/constants';
 export const signin = async (req: Request, res: Response) => {
     try {
         const userExists = await User.findOne({
-            emailAddress: req.body.emailAddress
+            email_address: req.body.email_address
         });
 
         if (!userExists) {
@@ -38,7 +38,7 @@ export const signup = async (req: Request, res: Response) => {
         const salt = await bcrypt.genSalt(14);
         const hashedPassword = await bcrypt.hash(req.body.password, salt);
         const userExists = await User.findOne({
-            emailAddress: req.body.emailAddress
+            email_address: req.body.email_address
         });
 
         const validatePassword = (value: string) => {
