@@ -75,7 +75,6 @@ export const deleteTransaction = async (req: Request, res: Response) => {
 
 export const deleteTransactions = async (req: Request, res: Response) => {
     try {
-        const id = req.params.id;
         const deleteTransactions = await Transaction.deleteMany();
         res.status(200).json(deleteTransactions);
     } catch (error) {
