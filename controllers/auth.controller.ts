@@ -26,7 +26,12 @@ export const signin = async (req: Request, res: Response) => {
 
         res.header('token', token).json({
             token: token,
-            user: userExists
+            user: {
+                id: userExists.id,
+                first_name: userExists.firstname,
+                last_name: userExists.lastname,
+                role: userExists.role
+            }
         });
     } catch (error) {
         return res.status(400).json({ message: error });
