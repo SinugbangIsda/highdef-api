@@ -28,8 +28,8 @@ export const signin = async (req: Request, res: Response) => {
             token: token,
             user: {
                 id: userExists.id,
-                first_name: userExists.firstname,
-                last_name: userExists.lastname,
+                firstname: userExists.firstname,
+                lastname: userExists.lastname,
                 role: userExists.role
             }
         });
