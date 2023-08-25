@@ -21,7 +21,7 @@ export const signin = async (req: Request, res: Response) => {
         }
 
         const token = jwt.sign({ _id: userExists._id }, SECRET_TOKEN, {
-            expiresIn: '1h'
+            expiresIn: '2d'
         });
 
         res.header('token', token).json({
