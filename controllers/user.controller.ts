@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import User from '../models/user.model';
+import bcrypt from 'bcrypt';
 
 export const getUser = async (req: Request, res: Response) => {
     try {
@@ -38,7 +39,15 @@ export const getUsers = async (req: Request, res: Response) => {
 export const updateUser = async (req: Request, res: Response) => {
     try {
         const id = req.params.id;
-        const findAndUpdateUser = await User.findByIdAndUpdate(id, req.body, { new: true });
+        const requesterId = req.body.requesterId;
+        let updatedBody = req.body;
+
+        if (requesterId !== id) {
+            delete updatedBody.password;
+            delete updatedBody.requesterId;
+        }
+
+        const findAndUpdateUser = await User.findByIdAndUpdate(id, updatedBody, { new: true });
         res.status(200).json(findAndUpdateUser);
     } catch (error) {
         res.status(400).json({ message: error });
