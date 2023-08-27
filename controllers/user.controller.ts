@@ -41,10 +41,22 @@ export const updateUser = async (req: Request, res: Response) => {
         const id = req.params.id;
         const requesterId = req.body.requesterId;
         let updatedBody = req.body;
+        const userData = await User.findOne({ _id: id });
 
         if (requesterId !== id) {
             delete updatedBody.password;
             delete updatedBody.requesterId;
+        } else {
+            if (!/^\$2[ayb]\$.{56}$/.test(updatedBody.password)) {
+                const verifyPassword = await bcrypt.compare(updatedBody.password, userData?.password!);
+                if (verifyPassword) {
+                    delete updatedBody.password;
+                } else {
+                    const salt = await bcrypt.genSalt(14);
+                    const hashedPassword = await bcrypt.hash(updatedBody.password, salt);
+                    updatedBody.password = hashedPassword;
+                }
+            }
         }
 
         const findAndUpdateUser = await User.findByIdAndUpdate(id, updatedBody, { new: true });
