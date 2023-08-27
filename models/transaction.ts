@@ -9,6 +9,10 @@ const transactionSchema = new mongoose.Schema(
         products: {
             type: Array,
             required: true
+        },
+        isDeleted: {
+            type: Boolean,
+            required: true
         }
     },
     { timestamps: true }
