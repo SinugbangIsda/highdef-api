@@ -44,3 +44,13 @@ export const updateUser = async (req: Request, res: Response) => {
         res.status(400).json({ message: error });
     }
 };
+
+export const deleteUser = async (req: Request, res: Response) => {
+    try {
+        const id = req.params.id;
+        const findAndDeleteUser = await User.findByIdAndDelete(id);
+        res.status(200).json(findAndDeleteUser);
+    } catch (error) {
+        res.status(400).json({ message: error });
+    }
+};
