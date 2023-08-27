@@ -25,3 +25,12 @@ export const getUsersPerPage = async (req: Request, res: Response) => {
         res.status(400).json({ message: error });
     }
 };
+
+export const getUsers = async (req: Request, res: Response) => {
+    try {
+        const Users = await User.find();
+        res.status(200).json(Users);
+    } catch (error) {
+        res.status(400).json({ message: error });
+    }
+};
