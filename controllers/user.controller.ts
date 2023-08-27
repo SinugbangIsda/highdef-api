@@ -54,3 +54,12 @@ export const deleteUser = async (req: Request, res: Response) => {
         res.status(400).json({ message: error });
     }
 };
+
+export const deleteUsers = async (req: Request, res: Response) => {
+    try {
+        const deleteUsers = await User.deleteMany();
+        res.status(200).json(deleteUsers);
+    } catch (error) {
+        res.status(400).json({ message: error });
+    }
+};
