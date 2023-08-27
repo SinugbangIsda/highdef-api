@@ -34,3 +34,13 @@ export const getUsers = async (req: Request, res: Response) => {
         res.status(400).json({ message: error });
     }
 };
+
+export const updateUser = async (req: Request, res: Response) => {
+    try {
+        const id = req.params.id;
+        const findAndUpdateUser = await User.findByIdAndUpdate(id, req.body, { new: true });
+        res.status(200).json(findAndUpdateUser);
+    } catch (error) {
+        res.status(400).json({ message: error });
+    }
+};
