@@ -10,3 +10,18 @@ export const getUser = async (req: Request, res: Response) => {
         res.status(400).json({ message: error });
     }
 };
+
+export const getUsersPerPage = async (req: Request, res: Response) => {
+    try {
+        const { page = 1, limit = 20 } = req.query;
+        const Users = await User.aggregate([{ $sort: { createdAt: -1 } }, { $skip: ((page as number) - 1) * (limit as number) }, { $limit: (limit as number) * 1 }]);
+        const count = await User.countDocuments();
+        res.status(200).json({
+            Users,
+            totalPages: Math.ceil(count / (limit as number)),
+            currentPage: parseInt(page as string)
+        });
+    } catch (error) {
+        res.status(400).json({ message: error });
+    }
+};
