@@ -73,7 +73,7 @@ export const deleteTransaction = async (req: Request, res: Response) => {
 
 export const deleteTransactions = async (req: Request, res: Response) => {
     try {
-        const deleteTransactions = await Transaction.deleteMany();
+        const deleteTransactions = await Transaction.deleteMany({ isDeleted: true });
         res.status(200).json(deleteTransactions);
     } catch (error) {
         res.status(400).json({ message: error });
