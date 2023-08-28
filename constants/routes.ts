@@ -5,5 +5,6 @@ export const USER_BY_ID_ROUTE = BASE_URL + '/users/:id';
 export const USER_ROUTE = BASE_URL + '/users';
 export const USER_PER_PAGE_ROUTE = BASE_URL + 'users/p';
 export const TRANSACTIONS_ROUTE = BASE_URL + '/transactions';
+export const TRANSACTIONS_RECENT_ROUTE = BASE_URL + '/transactions/r';
 export const TRANSACTIONS_PER_PAGE_ROUTE = BASE_URL + '/transactions/p';
 export const TRANSACTIONS_BY_ID_ROUTE = BASE_URL + '/transactions/:id';
