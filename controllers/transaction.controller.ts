@@ -11,7 +11,7 @@ export const createTransaction = async (req: Request, res: Response) => {
             throw 'Transaction name already exists!';
         }
 
-        const transaction = new Transaction(req.body);
+        const transaction = new Transaction({ ...req.body, isDeleted: false });
         const savedTransaction = await transaction.save();
         res.status(200).json(savedTransaction);
     } catch (error) {
