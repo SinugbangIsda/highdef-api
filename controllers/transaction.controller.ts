@@ -52,9 +52,9 @@ export const getTransactionsPerPage = async (req: Request, res: Response) => {
     }
 };
 
-export const getTransactions = async (req: Request, res: Response) => {
+export const getRecentTransactions = async (req: Request, res: Response) => {
     try {
-        const transactions = await Transaction.find();
+        const transactions = await Transaction.find().sort({ createdAt: -1 }).limit(10);
         res.status(200).json(transactions);
     } catch (error) {
         res.status(400).json({ message: error });
