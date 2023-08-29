@@ -30,6 +30,7 @@ export const signin = async (req: Request, res: Response) => {
                 id: userExists.id,
                 firstname: userExists.firstname,
                 lastname: userExists.lastname,
+                email_address: userExists.email_address,
                 role: userExists.role
             }
         });
