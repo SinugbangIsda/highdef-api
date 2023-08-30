@@ -7,14 +7,18 @@ const transactionSchema = new mongoose.Schema(
             required: true
         },
         products: {
-            type: Array,
+            type: Array<Object>,
             required: true
         },
         status: {
             type: String,
             required: true
         },
-        isDeleted: {
+        total_price: {
+            type: Number,
+            required: true
+        },
+        is_deleted: {
             type: Boolean,
             required: true
         }
