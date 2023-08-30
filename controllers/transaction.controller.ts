@@ -11,7 +11,7 @@ export const createTransaction = async (req: Request, res: Response) => {
             throw 'Transaction name already exists!';
         }
 
-        const transaction = new Transaction({ ...req.body, isDeleted: false });
+        const transaction = new Transaction({ ...req.body, is_deleted: false });
         const savedTransaction = await transaction.save();
         res.status(200).json(savedTransaction);
     } catch (error) {
@@ -41,8 +41,8 @@ export const getTransaction = async (req: Request, res: Response) => {
 
 export const getTransactionsPerPage = async (req: Request, res: Response) => {
     try {
-        const { page = 1, limit = 20, isDeleted = false } = req.query;
-        const query = { isDeleted: isDeleted === 'true' };
+        const { page = 1, limit = 20, is_deleted = false } = req.query;
+        const query = { is_deleted: is_deleted === 'true' };
         const transactions = await Transaction.aggregate([{ $match: query }, { $sort: { createdAt: -1 } }, { $skip: (+page - 1) * +limit }, { $limit: +limit }]);
         const count = await Transaction.countDocuments(query);
 
@@ -54,7 +54,7 @@ export const getTransactionsPerPage = async (req: Request, res: Response) => {
 
 export const getRecentTransactions = async (req: Request, res: Response) => {
     try {
-        const transactions = await Transaction.find().sort({ createdAt: -1 }).limit(10);
+        const transactions = await Transaction.find({ is_deleted: false }).sort({ createdAt: -1 }).limit(10);
         res.status(200).json(transactions);
     } catch (error) {
         res.status(400).json({ message: error });
