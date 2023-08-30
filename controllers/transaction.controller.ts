@@ -43,13 +43,7 @@ export const getTransactionsPerPage = async (req: Request, res: Response) => {
     try {
         const { page = 1, limit = 20, is_deleted = false } = req.query;
         const query = { is_deleted: is_deleted === 'true' };
-        const transactions = await Transaction.aggregate([
-            { $match: query },
-            { $sort: { createdAt: -1 } },
-            { $skip: (+page - 1) * +limit },
-            { $limit: +limit },
-            { $project: { transaction_name: 1, status: 1, total_price: 1, is_deleted: 1 } }
-        ]);
+        const transactions = await Transaction.aggregate([{ $match: query }, { $sort: { createdAt: -1 } }, { $skip: (+page - 1) * +limit }, { $limit: +limit }, { $project: { __v: 0, products: 0 } }]);
         const count = await Transaction.countDocuments(query);
 
         res.status(200).json({ transactions, totalPages: Math.ceil(count / +limit), currentPage: parseInt(page as string) });
@@ -60,7 +54,7 @@ export const getTransactionsPerPage = async (req: Request, res: Response) => {
 
 export const getRecentTransactions = async (req: Request, res: Response) => {
     try {
-        const transactions = await Transaction.find({ is_deleted: false }).sort({ createdAt: -1 }).limit(10).select('transaction_name total_price status');
+        const transactions = await Transaction.find({ is_deleted: false }).sort({ createdAt: -1 }).limit(10).select('-__v -products');
         res.status(200).json(transactions);
     } catch (error) {
         res.status(400).json({ message: error });
@@ -85,3 +79,5 @@ export const deleteTransactions = async (req: Request, res: Response) => {
         res.status(400).json({ message: error });
     }
 };
+
+export const exportTransactionsFile = async (req: Request, res: Response) => {};
