@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true
         },
-        isActivated: {
+        is_activated: {
             type: Boolean,
             required: true
         }
