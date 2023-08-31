@@ -14,7 +14,7 @@ export const getUser = async (req: Request, res: Response) => {
 
 export const getUsersPerPage = async (req: Request, res: Response) => {
     try {
-        const { page = 1, limit = 20 } = req.query;
+        const { page = 1, limit = 10 } = req.query;
         const Users = await User.aggregate([{ $sort: { createdAt: -1 } }, { $skip: ((page as number) - 1) * (limit as number) }, { $limit: (limit as number) * 1 }]);
         const count = await User.countDocuments();
         res.status(200).json({
