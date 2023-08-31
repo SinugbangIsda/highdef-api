@@ -41,7 +41,7 @@ export const getTransaction = async (req: Request, res: Response) => {
 
 export const getTransactionsPerPage = async (req: Request, res: Response) => {
     try {
-        const { page = 1, limit = 20, is_deleted = false } = req.query;
+        const { page = 1, limit = 10, is_deleted = false } = req.query;
         const query = { is_deleted: is_deleted === 'true' };
         const transactions = await Transaction.aggregate([{ $match: query }, { $sort: { createdAt: -1 } }, { $skip: (+page - 1) * +limit }, { $limit: +limit }, { $project: { __v: 0, products: 0 } }]);
         const count = await Transaction.countDocuments(query);
