@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt';
 export const getUser = async (req: Request, res: Response) => {
     try {
         const id = req.params.id;
-        const findUser = await User.find({ _id: id });
+        const findUser = await User.find({ _id: id, is_activated: true });
         res.status(200).json(findUser);
     } catch (error) {
         res.status(400).json({ message: error });
@@ -14,9 +14,16 @@ export const getUser = async (req: Request, res: Response) => {
 
 export const getUsersPerPage = async (req: Request, res: Response) => {
     try {
-        const { page = 1, limit = 10 } = req.query;
-        const Users = await User.aggregate([{ $sort: { createdAt: -1 } }, { $skip: ((page as number) - 1) * (limit as number) }, { $limit: (limit as number) * 1 }]);
-        const count = await User.countDocuments();
+        const { page = 1, limit = 10, is_activated = false } = req.query;
+        const query = { is_activated: is_activated === 'true' };
+        const Users = await User.aggregate([
+            { $match: query },
+            { $sort: { createdAt: -1 } },
+            { $skip: ((page as number) - 1) * (limit as number) },
+            { $limit: (limit as number) * 1 },
+            { $project: { __v: 0 } }
+        ]);
+        const count = await User.countDocuments(query);
         res.status(200).json({
             Users,
             totalPages: Math.ceil(count / (limit as number)),

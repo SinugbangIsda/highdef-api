@@ -10,8 +10,17 @@ export const signin = async (req: Request, res: Response) => {
             email_address: req.body.email_address
         });
 
+        const userValidated = await User.findOne({
+            email_address: req.body.email_address,
+            is_activated: true
+        });
+
         if (!userExists) {
             throw 'Account does not exist!';
+        }
+
+        if (!userValidated) {
+            throw 'Account is still under review.';
         }
 
         const verifyPassword = await bcrypt.compare(req.body.password, userExists.password);
@@ -64,6 +73,7 @@ export const signup = async (req: Request, res: Response) => {
 
         const user = new User({
             ...req.body,
+            is_activated: false,
             password: hashedPassword
         });
 
