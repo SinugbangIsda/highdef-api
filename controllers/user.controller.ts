@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt';
 export const getUser = async (req: Request, res: Response) => {
     try {
         const id = req.params.id;
-        const findUser = await User.find({ _id: id, is_activated: true });
+        const findUser = await User.find({ _id: id, is_activated: true }).select('-__v -password');
         res.status(200).json(findUser);
     } catch (error) {
         res.status(400).json({ message: error });
@@ -16,7 +16,7 @@ export const getUsers = async (req: Request, res: Response) => {
     try {
         const { is_activated = true } = req.query;
         const query = { is_activated: is_activated === 'true' };
-        const Users = await User.find(query).sort({ createdAt: -1 }).select('-__v');
+        const Users = await User.find(query).sort({ createdAt: -1 }).select('-__v -password');
         res.status(200).json(Users);
     } catch (error) {
         res.status(400).json({ message: error });
