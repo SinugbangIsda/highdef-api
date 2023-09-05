@@ -39,14 +39,12 @@ export const getTransaction = async (req: Request, res: Response) => {
     }
 };
 
-export const getTransactionsPerPage = async (req: Request, res: Response) => {
+export const getTransactions = async (req: Request, res: Response) => {
     try {
-        const { page = 1, limit = 10, is_deleted = false } = req.query;
+        const { is_deleted = false } = req.query;
         const query = { is_deleted: is_deleted === 'true' };
-        const transactions = await Transaction.aggregate([{ $match: query }, { $sort: { createdAt: -1 } }, { $skip: (+page - 1) * +limit }, { $limit: +limit }, { $project: { __v: 0 } }]);
-        const count = await Transaction.countDocuments(query);
-
-        res.status(200).json({ transactions, totalPages: Math.ceil(count / +limit), currentPage: parseInt(page as string) });
+        const transactions = await Transaction.find(query).sort({ createdAt: -1 }).select('-__v');
+        res.status(200).json(transactions);
     } catch (error) {
         res.status(400).json({ message: error });
     }

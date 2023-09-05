@@ -12,31 +12,11 @@ export const getUser = async (req: Request, res: Response) => {
     }
 };
 
-export const getUsersPerPage = async (req: Request, res: Response) => {
-    try {
-        const { page = 1, limit = 10, is_activated = true } = req.query;
-        const query = { is_activated: is_activated === 'true' };
-        const users = await User.aggregate([
-            { $match: query },
-            { $sort: { createdAt: -1 } },
-            { $skip: ((page as number) - 1) * (limit as number) },
-            { $limit: (limit as number) * 1 },
-            { $project: { __v: 0 } }
-        ]);
-        const count = await User.countDocuments(query);
-        res.status(200).json({
-            users,
-            totalPages: Math.ceil(count / (limit as number)),
-            currentPage: parseInt(page as string)
-        });
-    } catch (error) {
-        res.status(400).json({ message: error });
-    }
-};
-
 export const getUsers = async (req: Request, res: Response) => {
     try {
-        const Users = await User.find();
+        const { is_activated = true } = req.query;
+        const query = { is_activated: is_activated === 'true' };
+        const Users = await User.find(query).sort({ createdAt: -1 }).select('-__v');
         res.status(200).json(Users);
     } catch (error) {
         res.status(400).json({ message: error });
