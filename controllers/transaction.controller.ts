@@ -125,11 +125,17 @@ export const getTransactionsStatistics = async (req: Request, res: Response) => 
             },
             { $group: { _id: null, val: { $sum: '$total_price' } } }
         ]);
+
+        const totalSalesValue = total_sales[0] && total_sales[0].val ? total_sales[0].val : 0;
+        const highestSalesValue = highest_sales[0] && highest_sales[0].val ? highest_sales[0].val : 0;
+        const averageSalesValue = average_sales[0] && average_sales[0].val ? average_sales[0].val : 0;
+        const pendingSalesValue = pending_sales[0] && pending_sales[0].val ? pending_sales[0].val : 0;
+
         const statistics = {
-            total: total_sales[0],
-            average: average_sales[0],
-            highest: highest_sales[0],
-            pending: pending_sales[0]
+            total: totalSalesValue,
+            average: averageSalesValue,
+            highest: highestSalesValue,
+            pending: pendingSalesValue
         };
         res.status(200).json(statistics);
     } catch (error) {
