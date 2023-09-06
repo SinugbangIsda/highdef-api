@@ -71,68 +71,73 @@ export const getRecentTransactions = async (req: Request, res: Response) => {
 export const getTransactionsStatistics = async (req: Request, res: Response) => {
     try {
         const currentDate = new Date();
-        const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-        const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+        const startQuery = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        const endQuery = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+
         const total_sales = await Transaction.aggregate([
             {
                 $match: {
                     is_deleted: false,
                     status: 'Completed',
                     createdAt: {
-                        $gte: startOfMonth,
-                        $lte: endOfMonth
+                        $gte: startQuery,
+                        $lte: endQuery
                     }
                 }
             },
             { $group: { _id: null, val: { $sum: '$total_price' } } }
         ]);
+
         const average_sales = await Transaction.aggregate([
             {
                 $match: {
                     is_deleted: false,
                     status: 'Completed',
                     createdAt: {
-                        $gte: startOfMonth,
-                        $lte: endOfMonth
+                        $gte: startQuery,
+                        $lte: endQuery
                     }
                 }
             },
             { $group: { _id: null, val: { $avg: '$total_price' } } }
         ]);
+
         const highest_sales = await Transaction.aggregate([
             {
                 $match: {
                     is_deleted: false,
                     status: 'Completed',
                     createdAt: {
-                        $gte: startOfMonth,
-                        $lte: endOfMonth
+                        $gte: startQuery,
+                        $lte: endQuery
                     }
                 }
             },
             { $group: { _id: null, val: { $max: '$total_price' } } }
         ]);
+
         const pending_sales = await Transaction.aggregate([
             {
                 $match: {
                     is_deleted: false,
                     status: 'Pending',
                     createdAt: {
-                        $gte: startOfMonth,
-                        $lte: endOfMonth
+                        $gte: startQuery,
+                        $lte: endQuery
                     }
                 }
             },
             { $group: { _id: null, val: { $sum: '$total_price' } } }
         ]);
+
         const daily_sales = await Transaction.aggregate([
             {
                 $match: {
                     is_deleted: false,
                     status: 'Completed',
                     createdAt: {
-                        $gte: startOfMonth,
-                        $lte: endOfMonth
+                        $gte: startQuery,
+                        $lte: endQuery
                     }
                 }
             },
@@ -159,11 +164,34 @@ export const getTransactionsStatistics = async (req: Request, res: Response) => 
             }
         ]);
 
+        const getAllDatesInMonth = () => {
+            const dates = [];
+            const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 2);
+            const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+
+            for (let date = startOfMonth; date <= endOfMonth; date.setDate(date.getDate() + 1)) {
+                const formattedDate = date.toISOString().split('T')[0];
+                dates.push(formattedDate);
+            }
+
+            return dates;
+        };
+
+        const allDatesInMonth = getAllDatesInMonth();
+
+        const resultWithTotalSales = allDatesInMonth.map((date) => {
+            const data = daily_sales.find((val) => val.date === date);
+            return {
+                date,
+                total_sales: data ? data.total_sales : 0
+            };
+        });
+
         const totalSalesValue = total_sales[0] && total_sales[0].val ? total_sales[0].val : 0;
         const highestSalesValue = highest_sales[0] && highest_sales[0].val ? highest_sales[0].val : 0;
         const averageSalesValue = average_sales[0] && average_sales[0].val ? average_sales[0].val : 0;
         const pendingSalesValue = pending_sales[0] && pending_sales[0].val ? pending_sales[0].val : 0;
-        const dailySalesValue = daily_sales.length > 0 ? daily_sales : [];
+        const dailySalesValue = resultWithTotalSales.length > 0 ? resultWithTotalSales : [];
 
         const statistics = {
             total: totalSalesValue,
@@ -172,6 +200,7 @@ export const getTransactionsStatistics = async (req: Request, res: Response) => 
             pending: pendingSalesValue,
             daily: dailySalesValue
         };
+
         res.status(200).json(statistics);
     } catch (error) {
         res.status(400).json({ message: error });
