@@ -154,7 +154,7 @@ export const getTransactionsStatistics = async (req: Request, res: Response) => 
                 $project: {
                     _id: 0,
                     date: 1,
-                    totalSales: 1
+                    total_sales: 1
                 }
             }
         ]);
