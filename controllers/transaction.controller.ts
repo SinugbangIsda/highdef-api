@@ -70,10 +70,58 @@ export const getRecentTransactions = async (req: Request, res: Response) => {
 
 export const getTransactionsStatistics = async (req: Request, res: Response) => {
     try {
-        const total_sales = await Transaction.aggregate([{ $match: { is_deleted: false, status: 'Completed' } }, { $group: { _id: null, val: { $sum: '$total_price' } } }]);
-        const average_sales = await Transaction.aggregate([{ $match: { is_deleted: false, status: 'Completed' } }, { $group: { _id: null, val: { $avg: '$total_price' } } }]);
-        const highest_sales = await Transaction.aggregate([{ $match: { is_deleted: false, status: 'Completed' } }, { $group: { _id: null, val: { $max: '$total_price' } } }]);
-        const pending_sales = await Transaction.aggregate([{ $match: { is_deleted: false, status: 'Pending' } }, { $group: { _id: null, val: { $sum: '$total_price' } } }]);
+        const total_sales = await Transaction.aggregate([
+            {
+                $match: {
+                    is_deleted: false,
+                    status: 'Completed',
+                    createdAt: {
+                        $gte: moment().startOf('month').toDate(),
+                        $lte: moment().endOf('month').toDate()
+                    }
+                }
+            },
+            { $group: { _id: null, val: { $sum: '$total_price' } } }
+        ]);
+        const average_sales = await Transaction.aggregate([
+            {
+                $match: {
+                    is_deleted: false,
+                    status: 'Completed',
+                    createdAt: {
+                        $gte: moment().startOf('month').toDate(),
+                        $lte: moment().endOf('month').toDate()
+                    }
+                }
+            },
+            { $group: { _id: null, val: { $avg: '$total_price' } } }
+        ]);
+        const highest_sales = await Transaction.aggregate([
+            {
+                $match: {
+                    is_deleted: false,
+                    status: 'Completed',
+                    createdAt: {
+                        $gte: moment().startOf('month').toDate(),
+                        $lte: moment().endOf('month').toDate()
+                    }
+                }
+            },
+            { $group: { _id: null, val: { $max: '$total_price' } } }
+        ]);
+        const pending_sales = await Transaction.aggregate([
+            {
+                $match: {
+                    is_deleted: false,
+                    status: 'Pending',
+                    createdAt: {
+                        $gte: moment().startOf('month').toDate(),
+                        $lte: moment().endOf('month').toDate()
+                    }
+                }
+            },
+            { $group: { _id: null, val: { $sum: '$total_price' } } }
+        ]);
         const statistics = {
             total: total_sales[0],
             average: average_sales[0],
