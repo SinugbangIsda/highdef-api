@@ -70,14 +70,17 @@ export const getRecentTransactions = async (req: Request, res: Response) => {
 
 export const getTransactionsStatistics = async (req: Request, res: Response) => {
     try {
+        const currentDate = new Date();
+        const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
         const total_sales = await Transaction.aggregate([
             {
                 $match: {
                     is_deleted: false,
                     status: 'Completed',
                     createdAt: {
-                        $gte: moment().startOf('month').toDate(),
-                        $lte: moment().endOf('month').toDate()
+                        $gte: startOfMonth,
+                        $lte: endOfMonth
                     }
                 }
             },
@@ -89,8 +92,8 @@ export const getTransactionsStatistics = async (req: Request, res: Response) => 
                     is_deleted: false,
                     status: 'Completed',
                     createdAt: {
-                        $gte: moment().startOf('month').toDate(),
-                        $lte: moment().endOf('month').toDate()
+                        $gte: startOfMonth,
+                        $lte: endOfMonth
                     }
                 }
             },
@@ -102,8 +105,8 @@ export const getTransactionsStatistics = async (req: Request, res: Response) => 
                     is_deleted: false,
                     status: 'Completed',
                     createdAt: {
-                        $gte: moment().startOf('month').toDate(),
-                        $lte: moment().endOf('month').toDate()
+                        $gte: startOfMonth,
+                        $lte: endOfMonth
                     }
                 }
             },
@@ -115,8 +118,8 @@ export const getTransactionsStatistics = async (req: Request, res: Response) => 
                     is_deleted: false,
                     status: 'Pending',
                     createdAt: {
-                        $gte: moment().startOf('month').toDate(),
-                        $lte: moment().endOf('month').toDate()
+                        $gte: startOfMonth,
+                        $lte: endOfMonth
                     }
                 }
             },
