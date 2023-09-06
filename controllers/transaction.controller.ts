@@ -146,7 +146,7 @@ export const getTransactionsStatistics = async (req: Request, res: Response) => 
                 $group: {
                     _id: '$dayOfMonth',
                     date: { $first: '$date' },
-                    totalSales: { $sum: 1 }
+                    total_sales: { $sum: 1 }
                 }
             },
             { $sort: { _id: 1 } },
