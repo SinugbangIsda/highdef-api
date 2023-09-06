@@ -41,8 +41,17 @@ export const getTransaction = async (req: Request, res: Response) => {
 
 export const getTransactions = async (req: Request, res: Response) => {
     try {
-        const { is_deleted = false, status = 'Pending' } = req.query;
-        const query = { is_deleted: is_deleted === 'true', status: status };
+        const { is_deleted, status } = req.query;
+        const query = { is_deleted: is_deleted, status: status };
+
+        if (status === undefined) {
+            delete query.status;
+        }
+
+        if (is_deleted === undefined) {
+            delete query.is_deleted;
+        }
+
         const transactions = await Transaction.find(query).sort({ createdAt: -1 }).select('-__v');
         res.status(200).json(transactions);
     } catch (error) {
