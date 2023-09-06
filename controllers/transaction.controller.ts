@@ -41,8 +41,8 @@ export const getTransaction = async (req: Request, res: Response) => {
 
 export const getTransactions = async (req: Request, res: Response) => {
     try {
-        const { is_deleted = false } = req.query;
-        const query = { is_deleted: is_deleted === 'true' };
+        const { is_deleted = false, status = 'Pending' } = req.query;
+        const query = { is_deleted: is_deleted === 'true', status: status };
         const transactions = await Transaction.find(query).sort({ createdAt: -1 }).select('-__v');
         res.status(200).json(transactions);
     } catch (error) {
@@ -52,7 +52,7 @@ export const getTransactions = async (req: Request, res: Response) => {
 
 export const getRecentTransactions = async (req: Request, res: Response) => {
     try {
-        const transactions = await Transaction.find({ is_deleted: false }).sort({ createdAt: -1 }).limit(10).select('-__v');
+        const transactions = await Transaction.find({ is_deleted: false, status: 'Completed' }).sort({ createdAt: -1 }).limit(10).select('-__v');
         res.status(200).json(transactions);
     } catch (error) {
         res.status(400).json({ message: error });
