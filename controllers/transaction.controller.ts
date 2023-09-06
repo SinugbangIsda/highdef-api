@@ -125,17 +125,32 @@ export const getTransactionsStatistics = async (req: Request, res: Response) => 
             },
             { $group: { _id: null, val: { $sum: '$total_price' } } }
         ]);
+        const daily_sales = await Transaction.aggregate([
+            {
+                $match: {
+                    is_deleted: false,
+                    status: 'Completed',
+                    createdAt: {
+                        $gte: startOfMonth,
+                        $lte: endOfMonth
+                    }
+                }
+            },
+            { $group: { _id: null, val: { $sum: 1 } } }
+        ]);
 
         const totalSalesValue = total_sales[0] && total_sales[0].val ? total_sales[0].val : 0;
         const highestSalesValue = highest_sales[0] && highest_sales[0].val ? highest_sales[0].val : 0;
         const averageSalesValue = average_sales[0] && average_sales[0].val ? average_sales[0].val : 0;
         const pendingSalesValue = pending_sales[0] && pending_sales[0].val ? pending_sales[0].val : 0;
+        const dailySalesValue = daily_sales[0] && daily_sales[0].val ? daily_sales[0].val : 0;
 
         const statistics = {
             total: totalSalesValue,
             average: averageSalesValue,
             highest: highestSalesValue,
-            pending: pendingSalesValue
+            pending: pendingSalesValue,
+            daily: dailySalesValue
         };
         res.status(200).json(statistics);
     } catch (error) {
