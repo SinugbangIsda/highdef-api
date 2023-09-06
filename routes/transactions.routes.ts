@@ -1,10 +1,20 @@
 import express from 'express';
-import { TRANSACTIONS_BY_ID_ROUTE, TRANSACTIONS_RECENT_ROUTE, TRANSACTIONS_ROUTE } from '../constants/routes';
-import { createTransaction, deleteTransaction, deleteTransactions, getRecentTransactions, getTransaction, getTransactions, updateTransaction } from '../controllers/transaction.controller';
+import { TRANSACTIONS_BY_ID_ROUTE, TRANSACTIONS_RECENT_ROUTE, TRANSACTIONS_ROUTE, TRANSACTIONS_STATISTICS_ROUTE } from '../constants/routes';
+import {
+    createTransaction,
+    deleteTransaction,
+    deleteTransactions,
+    getRecentTransactions,
+    getTransaction,
+    getTransactions,
+    getTransactionsStatistics,
+    updateTransaction
+} from '../controllers/transaction.controller';
 import verifyToken from '../middlewares/verifyToken';
 
 const router = express.Router();
 
+router.get(TRANSACTIONS_STATISTICS_ROUTE, verifyToken, getTransactionsStatistics);
 router.get(TRANSACTIONS_RECENT_ROUTE, verifyToken, getRecentTransactions);
 router.get(TRANSACTIONS_ROUTE, verifyToken, getTransactions);
 router.get(TRANSACTIONS_BY_ID_ROUTE, verifyToken, getTransaction);

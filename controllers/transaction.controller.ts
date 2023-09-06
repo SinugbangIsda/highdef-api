@@ -59,6 +59,22 @@ export const getRecentTransactions = async (req: Request, res: Response) => {
     }
 };
 
+export const getTransactionsStatistics = async (req: Request, res: Response) => {
+    try {
+        const total_sales = await Transaction.aggregate([{ $match: { is_deleted: false } }, { $group: { _id: null, sum_val: { $sum: '$total_price' } } }]);
+        const average_sales = await Transaction.aggregate([{ $match: { is_deleted: false } }, { $group: { _id: null, average_val: { $avg: '$total_price' } } }]);
+        const highest_sales = await Transaction.aggregate([{ $match: { is_deleted: false } }, { $group: { _id: null, highest_val: { $max: '$total_price' } } }]);
+        const statistics = {
+            total: total_sales[0],
+            average: average_sales[0],
+            highest: highest_sales[0]
+        };
+        res.status(200).json(statistics);
+    } catch (error) {
+        res.status(400).json({ message: error });
+    }
+};
+
 export const deleteTransaction = async (req: Request, res: Response) => {
     try {
         const id = req.params.id;
