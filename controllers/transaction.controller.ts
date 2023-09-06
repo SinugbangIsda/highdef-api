@@ -136,14 +136,34 @@ export const getTransactionsStatistics = async (req: Request, res: Response) => 
                     }
                 }
             },
-            { $group: { _id: null, val: { $sum: 1 } } }
+            {
+                $addFields: {
+                    dayOfMonth: { $dayOfMonth: '$createdAt' },
+                    date: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } }
+                }
+            },
+            {
+                $group: {
+                    _id: '$dayOfMonth',
+                    date: { $first: '$date' },
+                    totalSales: { $sum: 1 }
+                }
+            },
+            { $sort: { _id: 1 } },
+            {
+                $project: {
+                    _id: 0,
+                    date: 1,
+                    totalSales: 1
+                }
+            }
         ]);
 
         const totalSalesValue = total_sales[0] && total_sales[0].val ? total_sales[0].val : 0;
         const highestSalesValue = highest_sales[0] && highest_sales[0].val ? highest_sales[0].val : 0;
         const averageSalesValue = average_sales[0] && average_sales[0].val ? average_sales[0].val : 0;
         const pendingSalesValue = pending_sales[0] && pending_sales[0].val ? pending_sales[0].val : 0;
-        const dailySalesValue = daily_sales[0] && daily_sales[0].val ? daily_sales[0].val : 0;
+        const dailySalesValue = daily_sales.length > 0 ? daily_sales : [];
 
         const statistics = {
             total: totalSalesValue,
