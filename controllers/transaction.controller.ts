@@ -61,15 +61,15 @@ export const getRecentTransactions = async (req: Request, res: Response) => {
 
 export const getTransactionsStatistics = async (req: Request, res: Response) => {
     try {
-        const total_sales = await Transaction.aggregate([{ $match: { is_deleted: false } }, { $group: { _id: null, val: { $sum: '$total_price' } } }]);
-        const average_sales = await Transaction.aggregate([{ $match: { is_deleted: false } }, { $group: { _id: null, val: { $avg: '$total_price' } } }]);
-        const highest_sales = await Transaction.aggregate([{ $match: { is_deleted: false } }, { $group: { _id: null, val: { $max: '$total_price' } } }]);
-        const pending_sales = await Transaction.aggregate([{ $match: { is_deleted: true } }, { $group: { _id: null, val: { $sum: '$total_price' } } }]);
+        const total_sales = await Transaction.aggregate([{ $match: { is_deleted: false, status: 'Completed' } }, { $group: { _id: null, val: { $sum: '$total_price' } } }]);
+        const average_sales = await Transaction.aggregate([{ $match: { is_deleted: false, status: 'Completed' } }, { $group: { _id: null, val: { $avg: '$total_price' } } }]);
+        const highest_sales = await Transaction.aggregate([{ $match: { is_deleted: false, status: 'Completed' } }, { $group: { _id: null, val: { $max: '$total_price' } } }]);
+        const pending_sales = await Transaction.aggregate([{ $match: { is_deleted: false, status: 'Pending' } }, { $group: { _id: null, val: { $sum: '$total_price' } } }]);
         const statistics = {
             total: total_sales[0],
             average: average_sales[0],
             highest: highest_sales[0],
-            pending_sales: pending_sales[0]
+            pending: pending_sales[0]
         };
         res.status(200).json(statistics);
     } catch (error) {
