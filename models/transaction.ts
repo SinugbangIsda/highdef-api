@@ -9,8 +9,8 @@ const transactionSchema = new mongoose.Schema({
         type: Array<Object>,
         required: true
     },
-    status: {
-        type: String,
+    is_completed: {
+        type: Boolean,
         required: true
     },
     payment_date: {

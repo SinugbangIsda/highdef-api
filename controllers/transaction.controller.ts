@@ -41,11 +41,11 @@ export const getTransaction = async (req: Request, res: Response) => {
 
 export const getTransactions = async (req: Request, res: Response) => {
     try {
-        const { is_deleted, status } = req.query;
-        const query = { is_deleted: is_deleted, status: status };
+        const { is_deleted, is_completed } = req.query;
+        const query = { is_deleted: is_deleted, is_completed: is_completed };
 
-        if (status === undefined) {
-            delete query.status;
+        if (is_completed === undefined) {
+            delete query.is_completed;
         }
 
         if (is_deleted === undefined) {
@@ -61,7 +61,7 @@ export const getTransactions = async (req: Request, res: Response) => {
 
 export const getRecentTransactions = async (req: Request, res: Response) => {
     try {
-        const transactions = await Transaction.find({ is_deleted: false, status: 'Completed' }).sort({ createdAt: -1 }).limit(5).select('-__v');
+        const transactions = await Transaction.find({ is_deleted: false, is_completed: true }).sort({ createdAt: -1 }).limit(5).select('-__v');
         res.status(200).json(transactions);
     } catch (error) {
         res.status(400).json({ message: error });
@@ -78,7 +78,7 @@ export const getTransactionsStatistics = async (req: Request, res: Response) => 
             {
                 $match: {
                     is_deleted: false,
-                    status: 'Completed',
+                    is_completed: true,
                     createdAt: {
                         $gte: startQuery,
                         $lte: endQuery
@@ -92,7 +92,7 @@ export const getTransactionsStatistics = async (req: Request, res: Response) => 
             {
                 $match: {
                     is_deleted: false,
-                    status: 'Completed',
+                    is_completed: true,
                     createdAt: {
                         $gte: startQuery,
                         $lte: endQuery
@@ -106,7 +106,7 @@ export const getTransactionsStatistics = async (req: Request, res: Response) => 
             {
                 $match: {
                     is_deleted: false,
-                    status: 'Completed',
+                    is_completed: true,
                     createdAt: {
                         $gte: startQuery,
                         $lte: endQuery
@@ -120,7 +120,7 @@ export const getTransactionsStatistics = async (req: Request, res: Response) => 
             {
                 $match: {
                     is_deleted: false,
-                    status: 'Pending',
+                    is_completed: false,
                     createdAt: {
                         $gte: startQuery,
                         $lte: endQuery
@@ -134,7 +134,7 @@ export const getTransactionsStatistics = async (req: Request, res: Response) => 
             {
                 $match: {
                     is_deleted: false,
-                    status: 'Completed',
+                    is_completed: true,
                     createdAt: {
                         $gte: startQuery,
                         $lte: endQuery
@@ -167,7 +167,7 @@ export const getTransactionsStatistics = async (req: Request, res: Response) => 
         const getAllDatesInMonth = () => {
             const dates = [];
             const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 2);
-            const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+            const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 2, 0);
 
             for (let date = startOfMonth; date <= endOfMonth; date.setDate(date.getDate() + 1)) {
                 const formattedDate = date.toISOString().split('T')[0];
@@ -225,5 +225,3 @@ export const deleteTransactions = async (req: Request, res: Response) => {
         res.status(400).json({ message: error });
     }
 };
-
-export const exportTransactionsFile = async (req: Request, res: Response) => {};
