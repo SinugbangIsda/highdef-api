@@ -71,17 +71,26 @@ export const getRecentTransactions = async (req: Request, res: Response) => {
 export const getTransactionsStatistics = async (req: Request, res: Response) => {
     try {
         const currentDate = new Date();
-        const startQuery = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-        const endQuery = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+        const lastDayOfPrevMonth = new Date(Date.UTC(currentDate.getFullYear(), currentDate.getMonth(), 0));
+        const firstDayOfNxtMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+
+        const formatDate = (date: any) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${month}/${day}/${year}`;
+        };
+        const lastDayOfPreviousMonth = formatDate(lastDayOfPrevMonth);
+        const firstDayOfNextMonth = formatDate(firstDayOfNxtMonth);
 
         const total_sales = await Transaction.aggregate([
             {
                 $match: {
                     is_deleted: false,
                     is_completed: true,
-                    createdAt: {
-                        $gte: startQuery,
-                        $lte: endQuery
+                    payment_date: {
+                        $gte: lastDayOfPreviousMonth,
+                        $lte: firstDayOfNextMonth
                     }
                 }
             },
@@ -93,9 +102,9 @@ export const getTransactionsStatistics = async (req: Request, res: Response) => 
                 $match: {
                     is_deleted: false,
                     is_completed: true,
-                    createdAt: {
-                        $gte: startQuery,
-                        $lte: endQuery
+                    payment_date: {
+                        $gte: lastDayOfPreviousMonth,
+                        $lte: firstDayOfNextMonth
                     }
                 }
             },
@@ -108,8 +117,8 @@ export const getTransactionsStatistics = async (req: Request, res: Response) => 
                     is_deleted: false,
                     is_completed: true,
                     createdAt: {
-                        $gte: startQuery,
-                        $lte: endQuery
+                        $gte: lastDayOfPreviousMonth,
+                        $lte: firstDayOfNextMonth
                     }
                 }
             },
@@ -122,8 +131,8 @@ export const getTransactionsStatistics = async (req: Request, res: Response) => 
                     is_deleted: false,
                     is_completed: false,
                     createdAt: {
-                        $gte: startQuery,
-                        $lte: endQuery
+                        $gte: lastDayOfPreviousMonth,
+                        $lte: firstDayOfNextMonth
                     }
                 }
             },
@@ -135,16 +144,21 @@ export const getTransactionsStatistics = async (req: Request, res: Response) => 
                 $match: {
                     is_deleted: false,
                     is_completed: true,
-                    createdAt: {
-                        $gte: startQuery,
-                        $lte: endQuery
+                    payment_date: {
+                        $gte: lastDayOfPreviousMonth,
+                        $lte: firstDayOfNextMonth
                     }
                 }
             },
             {
                 $addFields: {
-                    dayOfMonth: { $dayOfMonth: '$createdAt' },
-                    date: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } }
+                    dayOfMonth: { $dayOfMonth: '$payment_date' },
+                    date: {
+                        $dateToString: {
+                            format: '%m/%d/%Y',
+                            date: '$payment_date'
+                        }
+                    }
                 }
             },
             {
@@ -164,13 +178,14 @@ export const getTransactionsStatistics = async (req: Request, res: Response) => 
             }
         ]);
 
+        const firstDayOfCurrMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        const lastDayOfCurrMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+
         const getAllDatesInMonth = () => {
             const dates = [];
-            const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 2);
-            const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 2, 0);
 
-            for (let date = startOfMonth; date <= endOfMonth; date.setDate(date.getDate() + 1)) {
-                const formattedDate = date.toISOString().split('T')[0];
+            for (let date = firstDayOfCurrMonth; date <= lastDayOfCurrMonth; date.setDate(date.getDate() + 1)) {
+                const formattedDate = formatDate(date);
                 dates.push(formattedDate);
             }
 
