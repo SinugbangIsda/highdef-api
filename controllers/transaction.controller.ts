@@ -3,14 +3,6 @@ import Transaction from '../models/transaction';
 
 export const createTransaction = async (req: Request, res: Response) => {
     try {
-        const transactionExists = await Transaction.findOne({
-            transaction_name: req.body.transaction_name
-        });
-
-        if (transactionExists) {
-            throw 'Transaction name already exists!';
-        }
-
         const transaction = new Transaction({ ...req.body, is_deleted: false });
         const savedTransaction = await transaction.save();
         res.status(200).json(savedTransaction);
