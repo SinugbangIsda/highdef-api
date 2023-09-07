@@ -15,7 +15,7 @@ const transactionSchema = new mongoose.Schema(
             required: true
         },
         payment_date: {
-            type: Date,
+            type: Date || null,
             required: false
         },
         total_price: {
