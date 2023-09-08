@@ -6,6 +6,8 @@ import cors from 'cors';
 import transactionsRoute from './routes/transactions.routes';
 import authRoute from './routes/auth.routes';
 import userRoute from './routes/user.routes';
+import cron from 'node-cron';
+import Transaction from './models/transaction';
 
 const app = express();
 
@@ -64,6 +66,25 @@ const startServer = () => {
             message: error.message
         });
     });
+
+    // CRON
+    const schedule = () => {
+        const cronJobPattern = '0 0 */14 * *'; // This will run the task at midnight every 2 weeks
+
+        const cronTask = async () => {
+            try {
+                console.log('Deleting transactions...');
+                const deletedTransactions = await Transaction.deleteMany({ is_deleted: true });
+                console.log(`Deleted ${deletedTransactions.deletedCount} transactions.`);
+            } catch (error) {
+                console.error('An error occurred while deleting transactions:', error);
+            }
+        };
+
+        cron.schedule(cronJobPattern, cronTask);
+    };
+
+    schedule();
 
     http.createServer(app).listen(config.server.port, () => console.log(`Server is running on port ${config.server.port}.`));
 };
