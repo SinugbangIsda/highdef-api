@@ -75,7 +75,7 @@ export const signup = async (req: Request, res: Response) => {
         const user = new User({
             ...req.body,
             is_activated: false,
-            role: 'user',
+            role: 'User',
             password: hashedPassword
         });
 
