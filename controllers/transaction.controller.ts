@@ -161,11 +161,18 @@ export const getTransactionsStatistics = async (req: Request, res: Response) => 
             }
         ]);
 
+        const formatDate = (date: Date) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${month}/${day}/${year}`;
+        };
         const getAllDatesInMonth = () => {
             const dates = [];
 
             for (let date = firstDayOfCurrentMonth; date <= lastDayOfCurrentMonth; date.setDate(date.getDate() + 1)) {
-                dates.push(date);
+                const formattedDate = formatDate(date);
+                dates.push(formattedDate);
             }
 
             return dates;
