@@ -30,18 +30,13 @@ export const signin = async (req: Request, res: Response) => {
         }
 
         const token = jwt.sign({ _id: userExists._id }, SECRET_TOKEN, {
-            expiresIn: '2d'
+            expiresIn: '1d'
         });
 
         res.header('token', token).json({
             token: token,
             user: {
-                id: userExists.id,
-                firstname: userExists.firstname,
-                lastname: userExists.lastname,
-                email_address: userExists.email_address,
-                role: userExists.role,
-                is_activated: userExists.is_activated
+                id: userExists.id
             }
         });
     } catch (error) {
