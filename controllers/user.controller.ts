@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt';
 export const getUser = async (req: Request, res: Response) => {
     try {
         const id = req.params.id;
-        const findUser = await User.find({ _id: id, is_activated: true }).select('-__v -password');
+        const findUser = await User.find({ _id: id }).select('-__v -password');
         res.status(200).json(findUser);
     } catch (error) {
         res.status(400).json({ message: error });
